@@ -1,0 +1,15 @@
+services:
+
+  db01:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: accounts
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin123
+    volumes:
+      - ./src/main/resources/db_backup.sql:/docker-entrypoint-initdb.d/db_backup.sql
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:      

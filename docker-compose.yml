@@ -1,5 +1,8 @@
 services:
 
+  mc01:
+    image: memcached:1.6
+
   db01:
     image: mysql:5.7
     environment:

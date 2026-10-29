@@ -27,5 +27,12 @@ services:
      - mc01
      - rmq01
 
+  web01:
+    build: ./nginx
+    ports: 
+      - "80:80"
+    depends_on:
+     - app01
+
 volumes:
   dbdata:      

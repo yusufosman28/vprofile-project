@@ -20,5 +20,12 @@ services:
       - ./src/main/resources/db_backup.sql:/docker-entrypoint-initdb.d/db_backup.sql
       - dbdata:/var/lib/mysql
 
+  app01:
+    build: .
+    depends_on:
+     - db01
+     - mc01
+     - rmq01
+
 volumes:
   dbdata:      

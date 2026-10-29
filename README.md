@@ -19,14 +19,7 @@
 
 ## 🏗️ Architecture
 
-```mermaid
-flowchart LR
-    B([Browser]) -->|localhost:80| W[web01<br/>Nginx]
-    W -->|app01:8080| A[app01<br/>Tomcat]
-    A -->|db01:3306| D[(db01<br/>MySQL)]
-    A -->|mc01:11211| M[mc01<br/>Memcached]
-    A -->|rmq01:5672| R[rmq01<br/>RabbitMQ]
-```
+![vProfile architecture](docs/architecture.svg)
 
 > **Only Nginx is published (port 80).** Everything else talks over the Compose network by service name and is never exposed to the host.
 

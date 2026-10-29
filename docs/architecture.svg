@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/>
+    </marker>
+    <marker id="arrw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ffffff"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect width="1100" height="720" fill="#1b1b1f"/>
+
+  <!-- title -->
+  <text x="40" y="44" fill="#ffffff" font-size="22" font-weight="700">vProfile: Docker Compose architecture</text>
+  <text x="40" y="68" fill="#9e9e9e" font-size="13">5 containers · 1 published port · services talk by Compose service name</text>
+
+  <!-- browser -->
+  <g transform="translate(550,95)">
+    <circle cx="0" cy="-8" r="10" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+    <path d="M-18,22 a18,16 0 0 1 36,0" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+    <text x="30" y="8" fill="#ffffff" font-size="15" font-weight="600">Browser</text>
+  </g>
+
+  <!-- docker host boundary -->
+  <rect x="40" y="140" width="1020" height="545" rx="4" fill="none" stroke="#6b6b6b" stroke-width="1.5"/>
+  <rect x="40" y="140" width="30" height="26" fill="#2496ED"/>
+  <g transform="translate(44,146)" fill="#ffffff">
+    <rect x="0" y="6" width="4" height="4"/><rect x="5" y="6" width="4" height="4"/><rect x="10" y="6" width="4" height="4"/>
+    <rect x="5" y="1" width="4" height="4"/><rect x="10" y="1" width="4" height="4"/>
+    <path d="M-1,11 h20 q-2,6 -10,6 q-8,0 -10,-6z"/>
+  </g>
+  <text x="80" y="158" fill="#bdbdbd" font-size="13">Docker host: my laptop (WSL2 + Docker Desktop)</text>
+
+  <!-- compose network boundary -->
+  <rect x="200" y="190" width="830" height="465" rx="4" fill="#1f1b2b" stroke="#8C4FFF" stroke-width="2"/>
+  <text x="216" y="214" fill="#b18cff" font-size="13">Compose network (internal, name lookup)</text>
+
+  <!-- published port gate -->
+  <line x1="550" y1="125" x2="550" y2="250" stroke="#ffffff" stroke-width="2" marker-end="url(#arrw)"/>
+  <rect x="330" y="112" width="196" height="24" rx="4" fill="#1b1b1f" stroke="#8C4FFF" stroke-width="1.5"/>
+  <text x="428" y="129" fill="#ffffff" font-size="13" font-weight="600" text-anchor="middle">localhost:80 → 80 (published)</text>
+
+  <circle cx="550" cy="190" r="22" fill="#1b1b1f" stroke="#8C4FFF" stroke-width="2.5"/>
+  <path d="M540,201 v-12 a10,10 0 0 1 20,0 v12" fill="none" stroke="#b18cff" stroke-width="2.5"/>
+
+  <!-- web01 -->
+  <g>
+    <rect x="515" y="255" width="70" height="70" rx="8" fill="#009639"/>
+    <path d="M533,280 h30 l-7,-7 M567,300 h-30 l7,7" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="605" y="282" fill="#ffffff" font-size="15" font-weight="700">web01</text>
+    <text x="605" y="301" fill="#bdbdbd" font-size="13">Nginx 1.28.3 · reverse proxy</text>
+    <text x="605" y="318" fill="#7cd992" font-size="12">the only published service</text>
+  </g>
+
+  <!-- web01 -> app01 -->
+  <line x1="550" y1="325" x2="550" y2="388" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="560" y="362" fill="#bdbdbd" font-size="13">app01:8080</text>
+
+  <!-- app01 -->
+  <g>
+    <rect x="515" y="393" width="70" height="70" rx="8" fill="#F8DC75"/>
+    <text x="550" y="438" fill="#1b1b1f" font-size="26" font-weight="700" text-anchor="middle" font-family="Consolas, Menlo, monospace">{ }</text>
+    <text x="605" y="420" fill="#ffffff" font-size="15" font-weight="700">app01</text>
+    <text x="605" y="439" fill="#bdbdbd" font-size="13">Tomcat 9 · Java app (ROOT.war)</text>
+    <text x="605" y="456" fill="#9e9e9e" font-size="12">built multi-stage: Maven → JRE</text>
+  </g>
+
+  <!-- app01 -> backends -->
+  <path d="M550,463 V500 H300 V548" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr)"/>
+  <path d="M550,463 V548" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr)"/>
+  <path d="M550,500 H800 V548" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="308" y="530" fill="#bdbdbd" font-size="13">db01:3306</text>
+  <text x="558" y="530" fill="#bdbdbd" font-size="13">mc01:11211</text>
+  <text x="808" y="530" fill="#bdbdbd" font-size="13">rmq01:5672</text>
+
+  <!-- db01 -->
+  <g>
+    <rect x="265" y="553" width="70" height="70" rx="8" fill="#4479A1"/>
+    <ellipse cx="300" cy="573" rx="16" ry="6" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+    <path d="M284,573 v28 a16,6 0 0 0 32,0 v-28 M284,587 a16,6 0 0 0 32,0" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+    <text x="300" y="642" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">db01</text>
+  </g>
+  <text x="345" y="583" fill="#bdbdbd" font-size="13">MySQL 5.7</text>
+
+  <!-- mc01 -->
+  <g>
+    <rect x="515" y="553" width="70" height="70" rx="8" fill="#6DB33F"/>
+    <path d="M556,566 l-16,26 h12 l-6,20 l18,-28 h-12z" fill="#ffffff"/>
+    <text x="550" y="642" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">mc01</text>
+  </g>
+  <text x="595" y="583" fill="#bdbdbd" font-size="13">Memcached 1.6</text>
+
+  <!-- rmq01 -->
+  <g>
+    <rect x="765" y="553" width="70" height="70" rx="8" fill="#FF6600"/>
+    <rect x="783" y="574" width="34" height="24" rx="2" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+    <path d="M783,576 l17,12 l17,-12" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+    <text x="800" y="642" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">rmq01</text>
+  </g>
+  <text x="845" y="583" fill="#bdbdbd" font-size="13">RabbitMQ 4.4</text>
+
+  <!-- named volume (outside network, on host) -->
+  <g>
+    <ellipse cx="115" cy="568" rx="34" ry="10" fill="#2a2a30" stroke="#8c8cff" stroke-width="2"/>
+    <path d="M81,568 v44 a34,10 0 0 0 68,0 v-44" fill="#2a2a30" stroke="#8c8cff" stroke-width="2"/>
+    <ellipse cx="115" cy="568" rx="34" ry="10" fill="none" stroke="#8c8cff" stroke-width="2"/>
+    <text x="115" y="597" fill="#ffffff" font-size="13" font-weight="700" text-anchor="middle">dbdata</text>
+    <text x="115" y="642" fill="#8c8cff" font-size="12" text-anchor="middle">named volume</text>
+  </g>
+  <path d="M265,588 H151" fill="none" stroke="#8c8cff" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+  <text x="206" y="612" fill="#8c8cff" font-size="11">/var/lib/mysql</text>
+
+  <!-- legend -->
+  <g transform="translate(40,705)" font-size="12">
+    <line x1="0" y1="-4" x2="24" y2="-4" stroke="#a78bfa" stroke-width="2"/>
+    <text x="30" y="0" fill="#9e9e9e">traffic (internal, by service name)</text>
+    <line x1="260" y1="-4" x2="284" y2="-4" stroke="#ffffff" stroke-width="2"/>
+    <text x="290" y="0" fill="#9e9e9e">published to the host</text>
+    <line x1="450" y1="-4" x2="474" y2="-4" stroke="#8c8cff" stroke-width="2" stroke-dasharray="5,4"/>
+    <text x="480" y="0" fill="#9e9e9e">data persisted outside the container</text>
+  </g>
+</svg>

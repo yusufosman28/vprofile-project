@@ -1,16 +1,16 @@
 services:
 
   rmq01:
-    image: rabbitmq:4.4
+    image: rabbitmq:4.4.0
     environment:
       RABBITMQ_DEFAULT_USER: test
       RABBITMQ_DEFAULT_PASS: test
   
   mc01:
-    image: memcached:1.6
+    image: memcached:1.6.45
 
   db01:
-    image: mysql:5.7
+    image: mysql:5.7.44
     environment:
       MYSQL_ROOT_PASSWORD: my-secret-pw
       MYSQL_DATABASE: accounts

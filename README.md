@@ -4,9 +4,9 @@
 ![Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Proxy-Nginx%201.28.3-009639?logo=nginx&logoColor=white)
 ![Tomcat](https://img.shields.io/badge/App%20Server-Tomcat%209-F8DC75?logo=apachetomcat&logoColor=black)
-![MySQL](https://img.shields.io/badge/Database-MySQL%205.7-4479A1?logo=mysql&logoColor=white)
-![Memcached](https://img.shields.io/badge/Cache-Memcached%201.6-6DB33F)
-![RabbitMQ](https://img.shields.io/badge/Queue-RabbitMQ%204.4-FF6600?logo=rabbitmq&logoColor=white)
+![MySQL](https://img.shields.io/badge/Database-MySQL%205.7.44-4479A1?logo=mysql&logoColor=white)
+![Memcached](https://img.shields.io/badge/Cache-Memcached%201.6.45-6DB33F)
+![RabbitMQ](https://img.shields.io/badge/Queue-RabbitMQ%204.4.0-FF6600?logo=rabbitmq&logoColor=white)
 
 <p align="center">
   <img src="docs/architecture.svg" width="1100">
@@ -108,7 +108,7 @@ vprofile-project/
 - **app01** uses a two-stage Dockerfile: `maven:3.10.0-eclipse-temurin-8` builds `vprofile-v2.war`, then only the `.war` is copied into `tomcat:9.0.123-jre8-temurin-noble` as `ROOT.war`
 - Build tools never reach the final image, which is **158 MB**
 - **web01** extends `nginx:1.28.3` with a single `COPY` of the proxy config, giving a **62.9 MB** image
-- MySQL, Memcached and RabbitMQ use official images, configured through environment variables only
+- MySQL (`mysql:5.7.44`), Memcached (`memcached:1.6.45`) and RabbitMQ (`rabbitmq:4.4.0`) use official images, configured through environment variables and mounts rather than custom builds
 
 ![Image Sizes](docs/image-sizes.png)
 
@@ -140,8 +140,8 @@ vprofile-project/
 
 ### Configuration & Versioning
 
-- Every image is pinned to an exact version instead of a moving tag
-- The Nginx version was confirmed from the running container with `docker exec vprofile-project-web01-1 nginx -v`
+- Every image is pinned to an exact patch version instead of a moving tag, including the three official service images
+- Each version was confirmed from the running container before pinning, e.g. `docker exec vprofile-project-web01-1 nginx -v` and `docker exec vprofile-project-db01-1 mysqld --version`
 - Application settings are baked into the `.war` at build time, so changing `application.properties` requires a rebuild
 - `.dockerignore` excludes `.git`, `nginx`, `docker-compose.yml`, `docs` and the unused VM setups from the app01 build context
 - After a change to `nginx/default.conf` only, `docker compose up -d --build` recreates web01 and leaves app01 running
@@ -227,4 +227,4 @@ Potential improvements to further mature the project include:
 - Add `healthcheck` blocks with `condition: service_healthy` so services wait for real readiness
 - Run the test suite in `GitHub Actions` after updating JUnit to `4.13.2`
 - Pin images by `digest` rather than tag
-- Upgrade from `mysql:5.7`, which is end-of-life, to a supported MySQL release
+- Upgrade from MySQL 5.7, which is end-of-life, to a supported MySQL release

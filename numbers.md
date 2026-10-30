@@ -20,6 +20,6 @@ Real measurements from my own machine (ThinkPad, Docker Desktop on WSL2).
 | Maven (build stage) | 3.10.0-eclipse-temurin-8 |
 | Tomcat | 9.0.123-jre8-temurin-noble |
 | Nginx | 1.28.3 |
-| MySQL | 5.7 |
-| Memcached | 1.6 |
-| RabbitMQ | 4.4 |
+| MySQL | 5.7.44 |
+| Memcached | 1.6.45 |
+| RabbitMQ | 4.4.0 |

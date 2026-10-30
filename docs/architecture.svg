@@ -81,7 +81,7 @@
     <path d="M284,573 v28 a16,6 0 0 0 32,0 v-28 M284,587 a16,6 0 0 0 32,0" fill="none" stroke="#ffffff" stroke-width="2.5"/>
     <text x="300" y="642" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">db01</text>
   </g>
-  <text x="345" y="583" fill="#bdbdbd" font-size="13">MySQL 5.7</text>
+  <text x="345" y="583" fill="#bdbdbd" font-size="13">MySQL 5.7.44</text>
 
   <!-- mc01 -->
   <g>
@@ -89,7 +89,7 @@
     <path d="M556,566 l-16,26 h12 l-6,20 l18,-28 h-12z" fill="#ffffff"/>
     <text x="550" y="642" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">mc01</text>
   </g>
-  <text x="595" y="583" fill="#bdbdbd" font-size="13">Memcached 1.6</text>
+  <text x="595" y="583" fill="#bdbdbd" font-size="13">Memcached 1.6.45</text>
 
   <!-- rmq01 -->
   <g>
@@ -98,7 +98,7 @@
     <path d="M783,576 l17,12 l17,-12" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
     <text x="800" y="642" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">rmq01</text>
   </g>
-  <text x="845" y="583" fill="#bdbdbd" font-size="13">RabbitMQ 4.4</text>
+  <text x="845" y="583" fill="#bdbdbd" font-size="13">RabbitMQ 4.4.0</text>
 
   <!-- named volume (outside network, on host) -->
   <g>

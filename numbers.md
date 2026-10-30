@@ -11,6 +11,7 @@ Real measurements from my own machine (ThinkPad, Docker Desktop on WSL2).
 | Tomcat startup | 22.6 s (first run) → 13.2 s → 9.7 s |
 | Full stack rebuild from the compose file | `down` → `up -d` → all 5 Up in ~30 s |
 | Nginx-only change after adding .dockerignore | 1 container recreated (web01); app01 untouched |
+| app01 build after an Nginx-only change | 46.6 s (full rebuild) → 3.4 s (cached, with .dockerignore) |
 
 ## Pinned versions
 

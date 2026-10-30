@@ -106,7 +106,7 @@ vprofile-project/
 ### Containers & Build
 
 - **app01** uses a two-stage Dockerfile: `maven:3.10.0-eclipse-temurin-8` builds `vprofile-v2.war`, then only the `.war` is copied into `tomcat:9.0.123-jre8-temurin-noble` as `ROOT.war`
-- Build tools never reach the final image, which is **158 MB**
+- Build tools never reach the final image, which is **158 MB** (content size)
 - **web01** extends `nginx:1.28.3` with a single `COPY` of the proxy config, giving a **62.9 MB** image
 - MySQL (`mysql:5.7.44`), Memcached (`memcached:1.6.45`) and RabbitMQ (`rabbitmq:4.4.0`) use official images, configured through environment variables and mounts rather than custom builds
 
@@ -141,7 +141,7 @@ vprofile-project/
 ### Configuration & Versioning
 
 - Every image is pinned to an exact patch version instead of a moving tag, including the three official service images
-- Each version was confirmed from the running container before pinning, e.g. `docker exec vprofile-project-web01-1 nginx -v` and `docker exec vprofile-project-db01-1 mysqld --version`
+- The Nginx, MySQL, Memcached and RabbitMQ versions were confirmed from the running containers before pinning, e.g. `docker exec vprofile-project-web01-1 nginx -v` and `docker exec vprofile-project-db01-1 mysqld --version`
 - Application settings are baked into the `.war` at build time, so changing `application.properties` requires a rebuild
 - `.dockerignore` excludes `.git`, `nginx`, `docker-compose.yml`, `docs` and the unused VM setups from the app01 build context
 - After a change to `nginx/default.conf` only, `docker compose up -d --build` recreates web01 and leaves app01 running
@@ -164,7 +164,7 @@ vprofile-project/
 - **Tomcat 9, not 10**: the application uses `javax.servlet`; Tomcat 10 moved to the `jakarta` namespace
 - **Java 8**: `pom.xml` targets Java 1.8, so both stages use Java 8 images
 - **Tests skipped in the image build** (`-DskipTests`): the project's JUnit 4.10 is no longer supported by the current Maven Surefire plugin, and tests belong in a CI pipeline rather than the image build
-- **ElasticSearch left out**: it is listed in the original project but has no setup steps, and the application runs without it
+- **Elasticsearch left out**: it is listed in the original project but has no setup steps. Login, user data, caching and RabbitMQ all work without it; only the Elasticsearch page fails, returning HTTP 500 (`NoNodeAvailableException`) because `application.properties` still points at the original VM address `192.168.1.85:9300`
 - **`depends_on` for start order**: backends start before app01, and app01 before web01
 
 > [!NOTE]
@@ -228,3 +228,6 @@ Potential improvements to further mature the project include:
 - Run the test suite in `GitHub Actions` after updating JUnit to `4.13.2`
 - Pin images by `digest` rather than tag
 - Upgrade from MySQL 5.7, which is end-of-life, to a supported MySQL release
+- Move credentials out of `docker-compose.yml` into an `.env` file kept out of Git
+- Add Elasticsearch as a sixth service, or remove the Elasticsearch page, so no feature returns an error
+- Replace Tomcat's default error page, which currently shows the full Java stack trace to the user

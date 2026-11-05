@@ -27,13 +27,21 @@
 - [Lessons Learned](#lessons-learned)
 - [Future Improvements](#future-improvements)
 
+---
+
 ## Overview
 
-A five-service Java web application containerised and run with **Docker Compose**. The original project is a manual setup across five virtual machines, with packages installed by hand, firewall rules opened per service and hostnames written into `/etc/hosts`. This version replaces all of that with two custom images, three official images and a single compose file.
+A five-service Java web application containerised and run with **Docker Compose**. The original project is a manual setup across separate virtual machines, with packages installed by hand, firewall rules opened per service and hostnames written into `/etc/hosts`. This version replaces all of that with two custom images, three official images and a single compose file.
 
-Traffic enters through an **Nginx** reverse proxy, the only service with a published port, and is forwarded to a **Tomcat** application server. The application reads from **MySQL**, caches results in **Memcached** and connects to **RabbitMQ**, all reached over the Compose network by service name. The whole stack builds and starts with one command.
+Traffic enters through an **Nginx** reverse proxy and is forwarded to a **Tomcat** application server. The application reads from **MySQL**, caches results in **Memcached** and connects to **RabbitMQ**. The whole stack builds and starts with one command.
 
-Forked from [hkhcoder/vprofile-project](https://github.com/hkhcoder/vprofile-project). The application code is the original author's; the containerisation is my own.
+The original VM-based architecture this project replaces:
+
+<p align="center">
+  <img src="docs/original-architecture.jpg" width="1100">
+</p>
+
+Forked from [hkhcoder/vprofile-project](https://github.com/hkhcoder/vprofile-project). The application code and the original architecture diagram are the original author's; the containerisation is my own.
 
 ---
 
@@ -51,12 +59,11 @@ Forked from [hkhcoder/vprofile-project](https://github.com/hkhcoder/vprofile-pro
 
 The stack runs on a single Docker host, with every service attached to one Compose network:
 
-- **web01** (Nginx) is the single entry point, published on port 80
-- **app01** (Tomcat) serves the Java application on port 8080, reachable only from inside the network
-- **db01** (MySQL) stores application data on a named volume, initialised from a SQL dump on first start
-- **mc01** (Memcached) caches database reads
-- **rmq01** (RabbitMQ) provides the message broker
-- Services find each other through Compose DNS by service name, replacing `/etc/hosts` entries
+- **web01** (Nginx) - the single entry point, published on port 80
+- **app01** (Tomcat) - serves the Java application on port 8080 inside the network
+- **db01** (MySQL) - stores application data on a named volume
+- **mc01** (Memcached) - caches database reads
+- **rmq01** (RabbitMQ) - provides the message broker
 
 ---
 
@@ -66,8 +73,7 @@ The stack runs on a single Docker host, with every service attached to one Compo
 - **Multi-stage Docker build** for the Java application: Maven builds the `.war`, Tomcat runs it
 - **Nginx reverse proxy** built as a custom image with its configuration baked in
 - Only **one published port** (80); the application and backends are never exposed to the host
-- **Named volume** for MySQL data, so data survives `docker compose down`
-- Database **initialised automatically** from `db_backup.sql` on first start
+- **Named volume** for MySQL data, initialised automatically from `db_backup.sql` on first start
 - **Exact image versions pinned** for repeatable builds
 - **`.dockerignore`** so unrelated changes no longer rebuild the Java application
 
@@ -88,7 +94,8 @@ vprofile-project/
 │       │   └── db_backup.sql            # Database dump loaded on first start
 │       └── webapp/                # JSP views (original author)
 ├── docs/
-│   ├── architecture.svg           # Architecture diagram
+│   ├── architecture.svg           # Docker Compose architecture diagram
+│   ├── original-architecture.jpg  # Original VM architecture (original author)
 │   └── *.png                      # Application and terminal screenshots
 ├── Dockerfile                     # Multi-stage build: Maven → Tomcat 9
 ├── docker-compose.yml             # All five services, network and volume
@@ -108,7 +115,7 @@ vprofile-project/
 - **app01** uses a two-stage Dockerfile: `maven:3.10.0-eclipse-temurin-8` builds `vprofile-v2.war`, then only the `.war` is copied into `tomcat:9.0.123-jre8-temurin-noble` as `ROOT.war`
 - Build tools never reach the final image, which is **158 MB** (content size)
 - **web01** extends `nginx:1.28.3` with a single `COPY` of the proxy config, giving a **62.9 MB** image
-- MySQL (`mysql:5.7.44`), Memcached (`memcached:1.6.45`) and RabbitMQ (`rabbitmq:4.4.0`) use official images, configured through environment variables and mounts rather than custom builds
+- MySQL, Memcached and RabbitMQ use official images, configured through environment variables and mounts rather than custom builds
 
 ![Image Sizes](docs/image-sizes.png)
 
@@ -118,7 +125,7 @@ vprofile-project/
 ### Networking & Ingress
 
 - Compose creates one network and attaches every service to it
-- Services resolve each other by service name: `db01`, `mc01`, `rmq01`, `app01`
+- Services resolve each other by service name (`db01`, `mc01`, `rmq01`, `app01`), replacing the `/etc/hosts` entries from the VM setup
 - The hostnames in `application.properties` match the service names, so the application needed no code changes
 - Nginx proxies `/` to `http://app01:8080`
 - Only `web01` has a `ports:` entry; `docker compose ps` shows no published ports on the other four
@@ -126,7 +133,7 @@ vprofile-project/
 ![Compose Services](docs/compose-ps.png)
 
 > [!NOTE]
-> The original VM setup opens ports 3306, 11211, 5672 and 8080 in each server's firewall. Here none of them are reachable from the host, and Nginx remains the only public entry point.
+> The original VM setup opens ports 3306, 11211, 5672 and 8080 in each server's firewall. Here none of them are reachable from the host.
 
 ### Data & Persistence
 
@@ -140,12 +147,11 @@ vprofile-project/
 
 ### Configuration & Versioning
 
-- Every image is pinned to an exact patch version instead of a moving tag, including the three official service images
-- The Nginx, MySQL, Memcached and RabbitMQ versions were confirmed from the running containers before pinning, e.g. `docker exec vprofile-project-web01-1 nginx -v` and `docker exec vprofile-project-db01-1 mysqld --version`
+- Every image is pinned to an exact patch version instead of a moving tag
+- The versions were confirmed from the running containers before pinning, e.g. `docker exec vprofile-project-web01-1 nginx -v` and `docker exec vprofile-project-db01-1 mysqld --version`
 - Application settings are baked into the `.war` at build time, so changing `application.properties` requires a rebuild
 - `.dockerignore` excludes `.git`, `nginx`, `docker-compose.yml`, `docs` and the unused VM setups from the app01 build context
-- After a change to `nginx/default.conf` only, `docker compose up -d --build` recreates web01 and leaves app01 running
-- With the build context trimmed, an Nginx-only change rebuilds app01 from cache in **3.4 s**, compared with **46.6 s** when Maven has to run again
+- After an Nginx-only change, app01 rebuilds from cache in **3.4 s**, compared with **46.6 s** when Maven has to run again
 
 ![.dockerignore Proof](docs/dockerignore-proof.png)
 
